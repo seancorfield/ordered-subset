@@ -42,13 +42,13 @@
 
 (deftest empty-intersection-tests
   (testing "Set is empty, subset is non-empty."
-    (is (= [{:label "first"} {:label "second"}]
+    (is (= []
            (get-ordered-subset {} [:first :second]))))
   (testing "Set is non-empty, subset is empty."
     (is (= []
            (get-ordered-subset adam-set []))))
   (testing "Set is non-empty, subset doesn't match."
-    (is (= [{:label "first"} {:label "second"}]
+    (is (= []
            (get-ordered-subset adam-set [:first :second])))))
 
 ;; test that selecting bsaed on a random subset of keys works
@@ -83,8 +83,9 @@
   50
   (prop/for-all [m (gen/map gen/keyword (gen/map gen/keyword gen/string))
                  ks (gen/vector gen/keyword)]
-                (= (map name ks)
-                   (map :label (get-ordered-subset m ks)))))
+                (let [present (filter (fn [k] (get m k)) ks)]
+                  (= (map name present)
+                     (map :label (get-ordered-subset m present))))))
 
 ;; test that selecting based on known keys returns expected map entries
 (defspec known-keys-has-original-entries-plus-label
